@@ -1,6 +1,6 @@
 //-----------Initialization---------------
 const Discord = require("discord.js");
-const rp = require("request-promise");
+
 const { promisify } = require("util");
 const readdir = promisify(require("fs").readdir);
 
@@ -8,6 +8,7 @@ const client = new Discord.Client();
 client.config = require("./config.json");
 client.commands = new Discord.Collection();
 
+//-------------Function----------------------
 global.wait = promisify(setTimeout);
 
 (async function () {

@@ -6,7 +6,7 @@ module.exports = (client, msg) => {
     
     let command = client.commands.get(commandName);
     if(command){
-        console.log("LOG CMD", `USER ${msg.author.username} ran command -${commandName}- from \n GUILD:  | ${msg.guild.name} \n CHANNEL:| #${msg.channel.name}`, "RUN");
+        console.log("LOG CMD", `USER ${msg.author.username} RAN command | ${commandName} | from \n GUILD:  | ${msg.guild.name} \n CHANNEL:| #${msg.channel.name}`);
         
         command.run(client, msg, args);
     }
