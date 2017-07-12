@@ -1,0 +1,24 @@
+{
+  "name": "uoftdiscordbot",
+  "version": "1.0.0",
+  "description": "A Discord Bot for the usage of UoFT Students.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jellyfishe/UOFTDiscordBot.git"
+  },
+  "author": "Chelle",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jellyfishe/UOFTDiscordBot/issues"
+  },
+  "homepage": "https://github.com/jellyfishe/UOFTDiscordBot#readme",
+  "dependencies": {
+    "discord.js": "^11.1.0",
+    "request": "^2.81.0",
+    "request-promise": "^4.2.1"
+  }
+}
