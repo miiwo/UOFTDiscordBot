@@ -10,11 +10,11 @@ exports.run = async(client, msg, args) => {
     client.commands.delete(command);
     client.commands.set(command, cmd);
 
-    msg.reply(`The command \`${command}\` has been reloaded`);
+    msg.reply(`The command \`${command}\` has been reloaded!`);
 };
 
 exports.help = {
     name: "reload",
-    description: "Reloads a command that's been modified.",
+    description: "Reloads a command that's been modified. Use for development only.",
     usage: "reload [command]"
 };
