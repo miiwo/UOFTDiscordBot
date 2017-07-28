@@ -1,5 +1,3 @@
-// start time of exams is in seconds
-
 //Does not do UTSC course codes.
 //Exam data has up to 2016 times.
 
@@ -39,15 +37,16 @@ exports.run = async(client, msg, args) => {
             m.edit(":package: **||** Here are the result(s).");
             results.forEach((e, index) => m.channel.send({embed: createCourseEmbed(e, index)}));
             
-        // Shuttle Times
+        // Shuttle
         }else if(shuttleRegex.test(args[0])){ 
             m.channel.send({embed: displayShuttles(info)});
             m.delete();
-        // Exam Times
+            
+        // Exams
         }else if(examRegex.test(args[0])){
             if(args.length > 1 && courseCodeRegex.test(args[1].toUpperCase())) {
                 msg.channel.send({embed: displayExam(info)});
-                m.edit("This data was last updated for the `2016 year`.");
+                m.edit(":floppy_disk: **||** This data was last updated for the `2016 YEAR`.");
             }
         }
         m.channel.stopTyping();
@@ -100,8 +99,7 @@ function createSearchable(config, args) {
         
     }else if (examRegex.test(args[0])) {
         searchable.uri = `${config.cobalt}exams/filter`;
-        //searchable.qs.q = `code:"${args[1].toUpperCase()}" AND period:"${period}"`;
-        searchable.qs.q = `code:"${args[1].toUpperCase()}"`;
+        searchable.qs.q = `code:"${args[1].toUpperCase()}"`; //Provide period here once exam data gets updated.
         
     }else if (shuttleRegex.test(args[0])) {
         const now = new Date().toISOString().substr(0, 10);
@@ -135,6 +133,7 @@ function displayCourses(info){
 
 function displayShuttles(info){
     let utmTimes='', sgTimes='';
+    
     info.routes[0].stops[0].times.forEach((e, index) => {
         utmTimes += secondsToTimeFormat(e.time).toString().substring(-8) + ` ${e.rush_hour ? '`**`' : ''}\n`;
         sgTimes += secondsToTimeFormat(info.routes[0].stops[1].times[index].time) + ` ${info.routes[0].stops[1].times[index].rush_hour ? '`**`' : ''}\n`;
@@ -172,10 +171,6 @@ function secondsToTimeFormat(time, showTimeZone=false){
 
 //TODO: Fix this so it doesn't just grab the first result only.
 function displayExam(info){
-    /*const options = { hour: 'numeric',minute:'numeric', hour12: true};
-    const startTime = new Date(info[0].start_time*1000 + offset*60000).toLocaleTimeString("en-ca", options);
-    options.timeZoneName = 'short';
-    const endTime = new Date(info[0].end_time*1000 + offset*60000).toLocaleTimeString("en-ca", options);*/
     const startTime = secondsToTimeFormat(info[0].start_time);
     const endTime = secondsToTimeFormat(info[0].end_time, true);
     
@@ -207,16 +202,16 @@ function displayExam(info){
 }
 
 function displaySections(sections){
-    let thing = "";
-    let lectureCode = "";
+    let displayString = "", lectureCode = "";
+    
     sections.forEach(section => {
         if(lectureCode !== section.lecture_code){
-            thing += `**${section.lecture_code}** \n`;
+            displayString += `**${section.lecture_code}** \n`;
             lectureCode = section.lecture_code;
         }
-        thing += `${section.exam_section ? section.exam_section : section.location}    ${section.exam_section ? section.location.trim : section.exam_section} \n`;
+        displayString += `${section.exam_section ? section.exam_section : section.location}    ${section.exam_section ? section.location.trim : section.exam_section} \n`;
     });
-    return thing;
+    return displayString;
     
 }
             
@@ -245,7 +240,7 @@ function displayResults(info, query){
 }
 
 /**
-  * Creates the option for embed.
+  * Creates the options for a "Course" embed.
   *
   */
 function createCourseEmbed(msg, index){
