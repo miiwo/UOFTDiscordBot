@@ -1,5 +1,4 @@
 //Does not do UTSC course codes.
-//Exam data has up to 2016 times.
 
 const rp = require("request-promise");
 
@@ -7,7 +6,7 @@ const courseCodeRegex = /^[A-Z]{3}\d{3}$/;
 const shuttleRegex = /^(shuttle)$/;
 const examRegex = /(exam)/;
 const year = "2017";
-//const period = "DEC17";
+const period = "DEC17";
 const lim = 9;
 const DMTime = 3;
 const offset = 300;
@@ -16,7 +15,7 @@ const numbers = "①②③④⑤⑥⑦⑧⑨";
 exports.run = async(client, msg, args) => {
     const options = createSearchable(client.config, args);
 
-    if (!options) return msg.channel.send("Cannot search that.");
+    if (!options) return msg.channel.send(":x: **||** Not a valid search format.");
 
     let m = await msg.channel.send(":dvd: Searching now...");
     m.channel.startTyping();
@@ -39,7 +38,7 @@ exports.run = async(client, msg, args) => {
             
         // Shuttle
         }else if(shuttleRegex.test(args[0])){ 
-            m.channel.send({embed: displayShuttles(info)});
+            displayShuttles(info).forEach(e => m.channel.send({embed: e}));
             m.delete();
             
         // Exams
@@ -69,8 +68,8 @@ exports.help = {
 
 /**
   * Function that creates the correct filter options to use with the Request-Promise API.
-  * @param {} config - 
-  * @param {list} args -
+  * @param {} config - config file
+  * @param {list} args - arguments from the command
   */
 function createSearchable(config, args) {
     if(args.length == 0) return false;
@@ -90,7 +89,7 @@ function createSearchable(config, args) {
         searchable.uri = `${config.cobalt}courses/filter`;
         if(args.length > 1) {
             args[0] = args[0].toUpperCase();
-            args[1] = args[1].toUpperCase();
+            args[1] = args[1].toLowerCase() === 'sg' ? 'UTSG' : args[1].toUpperCase();
             
             if (['UTSG', 'UTM'].includes(args[1])) searchable.qs.q = `code:"${args[0]}" AND campus:"${args[1]}" AND term:"${year}"`;
             else return false;
@@ -99,8 +98,13 @@ function createSearchable(config, args) {
         
     }else if (examRegex.test(args[0])) {
         searchable.uri = `${config.cobalt}exams/filter`;
-        searchable.qs.q = `code:"${args[1].toUpperCase()}"`; //Provide period here once exam data gets updated.
-        
+        if(args.length > 2){
+            args[2] = args[2].toLowerCase() === 'sg' ? 'UTSG' : args[2].toUpperCase();
+            if (['UTSG', 'UTM'].includes(args[1])) searchable.qs.q = `code:"${args[1]}" AND period:"${period}"`;
+            
+        }else if(args.length > 1 && courseCodeRegex.test(args[1])) searchable.qs.q = `code:"${args[1]}"`; //Provide period here once exam data gets updated.
+        else return false;
+    
     }else if (shuttleRegex.test(args[0])) {
         const now = new Date().toISOString().substr(0, 10);
         searchable.uri = `${config.cobalt}transportation/shuttles/${now}`;     
@@ -112,7 +116,7 @@ function createSearchable(config, args) {
 
 /**
   * Function that concatenates courses with the same code into one object in the list.
-  * @param {list} info - 
+  * @param {list} info - List of Objects that contain the information retrieved from the request
   */
 function displayCourses(info){
     const courses = [info[0]];
@@ -130,38 +134,43 @@ function displayCourses(info){
     
     return courses;
 }
-
+/**
+  * Creates a list of JSObjects to be used as EmbedOptions for Message.channel.send
+  *
+  */
 function displayShuttles(info){
-    let utmTimes='', sgTimes='';
+    let timing='';
+    let routeEmbed = [];
     
-    info.routes[0].stops[0].times.forEach((e, index) => {
-        utmTimes += secondsToTimeFormat(e.time).toString().substring(-8) + ` ${e.rush_hour ? '`**`' : ''}\n`;
-        sgTimes += secondsToTimeFormat(info.routes[0].stops[1].times[index].time) + ` ${info.routes[0].stops[1].times[index].rush_hour ? '`**`' : ''}\n`;
-    });
-    return {
-        "title": `Shuttle Times for ${new Date(info.date).toDateString()} :oncoming_bus:`,
-        "color": 16777215,
-        "description": "`**` indicates rush hour.\n The regular one-way ticket fare is $6.00.",
-        "timestamp": new Date(),
-        "footer": {
-            "text": "Brought to you by the Cobalt API"
-        },
-        "fields": [
-            {
-                "name": `IB Layby :busstop:`,
-                "value": utmTimes,
-                "inline": true
+    info.routes.forEach(route => {
+        routeEmbed.push({
+            "title": `Shuttle Times for ${new Date(info.date).toDateString()} ${route.name} :oncoming_bus:`,
+            "color": 16777215,
+            "description": "`**` indicates rush hour.\n The regular one-way ticket fare is $6.00.",
+            "timestamp": new Date(),
+            "footer": {
+                "text": "Brought to you by the Cobalt API"
             },
-            {
-                "name": `Hart House :busstop:`,
-                "value": sgTimes,
-                "inline": true
-            }
+            "fields": []
+        });
+        route.stops.forEach(stop =>{
+            stop.times.forEach(t => {
+                timing += secondsToTimeFormat(t.time) + ` ${t.rush_hour ? '`**`' : ''}\n`;
+            });
             
-        ]
-    };
+            routeEmbed[routeEmbed.length - 1].fields.push({"name": ':busstop: ' + stop.location, "value": timing, "inline": true});
+            timing = '';
+        });
+    });
+    
+    return routeEmbed;
 }
 
+/**
+  * Function that turns seconds into a time String in EST time.
+  * @param {int} time - integer representing seconds
+  * @param {boolean} showTimeZone - Determines if 'EST' is shown at the end
+  */
 function secondsToTimeFormat(time, showTimeZone=false){
     const options = { hour: 'numeric',minute:'numeric', hour12: true};
     if(showTimeZone) options.timeZoneName = 'short';
@@ -169,7 +178,7 @@ function secondsToTimeFormat(time, showTimeZone=false){
     return new Date(time * 1000 + offset*60000).toLocaleTimeString("en-ca", options);
 }
 
-//TODO: Fix this so it doesn't just grab the first result only.
+//Grabs first result only
 function displayExam(info){
     const startTime = secondsToTimeFormat(info[0].start_time);
     const endTime = secondsToTimeFormat(info[0].end_time, true);
@@ -189,7 +198,7 @@ function displayExam(info){
             },
             {
                 "name": "Time",
-                "value": `${startTime.toString().substring(-8)} - ${endTime.toString().substring(-8)}`,
+                "value": `${startTime} - ${endTime}`,
                 "inline": true
             },
             {
@@ -200,7 +209,10 @@ function displayExam(info){
         ]
     };
 }
-
+/**
+  * Function that puts all the sections for an exam into a single String
+  * @param {list} sections - sections to concatenate
+  */
 function displaySections(sections){
     let displayString = "", lectureCode = "";
     
@@ -213,30 +225,6 @@ function displaySections(sections){
     });
     return displayString;
     
-}
-            
-    
-/**
-  * Function that formats text to display to the user information obtained from the API
-  * @param {} info
-  * @param {} query
-  */
-function displayResults(info, query){
-    let results = "";
-    if (query === "buildings") for(let i = 0; i < info.length; i++) results += "`" + (i + 1) + "` " + info[i].code + ": " + info[i].name + ", Address: " + info[i].address.street + "\n";
-    else if (query === "textbooks") for(let i = 0; i < info.length; i++) results += "`" + (i + 1) + "` " + info[i].title + " - Price: $" + info[i].price + "\n";
-    else if (query === "food") for(let i = 0; i < info.length; i++) results += "`" + (i + 1) + "` " + info[i].name + " - " + info[i].address + "\n";
-    else if (query === "transportation/parking") {
-        for(let i = 0; i < info.length; i++) {
-            const adr = info[i].address ? `Address: ${info[i].address}` : info[i].address;
-            results += "`" + (i + 1) + "` " + info[i].title + " - " + info[i].description + " " + adr + "\n";
-        }
-    } else if (query === "cdf/labs") {
-        results += `As of: ${info.timestamp}\n`;
-        for(let i = 0; i < info.labs.length; i++) results += "`" + (i + 1) + "` " + info.labs[i].name + ": Available:" + info.labs[i].available + "\n";
-    }
-    
-    return results;
 }
 
 /**

@@ -1,7 +1,9 @@
 # UOFTDiscordBot
 A bot on Discord written with the [Discord.js](https://discord.js.org/#/) API.
-Information about the University is found with the help of the [Cobalt API](https://cobalt.qas.im/).
-This bot's use is to help with any academic needs of UOFT students.
+
+Information about the University is retrieved with the help of the [Cobalt API](https://cobalt.qas.im/).
+
+The use of this bot is to help with any academic needs of UOFT students.
 
 USAGE
 -------------
