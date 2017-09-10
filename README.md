@@ -14,6 +14,8 @@ This bot can currently:
 * provide the shuttle time for today's date
 * provide a list of important links for UOFT
 
+Please input the following commands into Discord while the bot is running.
+
 ```
 !ut exam <course_code>
 !ut <course_code> [campus]

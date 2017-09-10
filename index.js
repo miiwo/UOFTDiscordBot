@@ -1,3 +1,7 @@
+//TODO: Implement a Scoreboard System on the Bot
+//TODO: Implement people adding their own Roles???? Still iffy about people abusing it buttt
+
+if (process.version.slice(1).split(".")[0] < 8) throw new Error("Node 8.0.0 or higher is required. Update Node on your system.");
 //-----------Initialization---------------
 const Discord = require("discord.js");
 
@@ -5,10 +9,12 @@ const { promisify } = require("util");
 const readdir = promisify(require("fs").readdir);
 
 const client = new Discord.Client();
+require("./modules/functions.js")(client);
 client.config = require("./config.json");
 client.commands = new Discord.Collection();
 
 //-------------Function----------------------
+
 global.wait = promisify(setTimeout);
 
 (async function () {

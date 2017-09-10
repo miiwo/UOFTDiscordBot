@@ -16,5 +16,6 @@ exports.run = async(client, msg, args) => {
 exports.help = {
     name: "reload",
     description: "Reloads a command that's been modified. Use for development only.",
+    permission: 10,
     usage: "reload [command]"
 };
