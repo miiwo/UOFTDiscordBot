@@ -17,7 +17,9 @@
   },
   "homepage": "https://github.com/jellyfishe/UOFTDiscordBot#readme",
   "dependencies": {
+    "MALjs": "^0.1.0",
     "discord.js": "^11.1.0",
+    "html-to-text": "^3.3.0",
     "request": "^2.81.0",
     "request-promise": "^4.2.1"
   }

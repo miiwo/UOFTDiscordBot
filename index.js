@@ -17,7 +17,8 @@ client.commands = new Discord.Collection();
 
 global.wait = promisify(setTimeout);
 
-(async function () {
+async function start() {
+    await wait(5000);
     const fcommand = await readdir("./commands/");
     fcommand.forEach(file => {
         try {
@@ -28,7 +29,7 @@ global.wait = promisify(setTimeout);
             console.log(`Error: ${e} \n ${e.stack}`);
         }
     });
-    
+
     const files = await readdir("./events/");
     files.forEach(file => {
         const eventName = file.split(".")[0];
@@ -36,6 +37,8 @@ global.wait = promisify(setTimeout);
         client.on(eventName, event.bind(null, client));
         delete require.cache[require.resolve(`./events/${file}`)];
     });
-    
+
     client.login(client.config.token);
-}());
+};
+
+start();
