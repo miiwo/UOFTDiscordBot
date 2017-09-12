@@ -15,7 +15,10 @@ const CAMPUSSHORTCUTS = ["UTSG", "UTM", "UTSC"];
 exports.run = async(client, msg, args) => {
     const options = createSearchable(client.config, args);
 
-    if (!options) return msg.channel.send(":x: **||** Not a valid search format.");
+    if (!options){
+        msg.channel.send(":x: **||** Not a valid search format.");
+        return;
+    }
 
     let m = await msg.channel.send(":dvd: Searching now...");
     m.channel.startTyping();
@@ -24,7 +27,8 @@ exports.run = async(client, msg, args) => {
         const info = await rp(options);
         if (info.length == 0) {
             m.channel.stopTyping();
-            return m.edit(":slight_frown: **||** Nothing came up.");
+            m.edit(":slight_frown: **||** Nothing came up.");
+            return;
         }
 
         // Courses
