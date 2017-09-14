@@ -46,17 +46,16 @@ module.exports = (client, msg) => {
                 if(a.length == 0) return b.length; 
                 if(b.length == 0) return a.length; 
 
-                var matrix = [];
+                let matrix = [];
 
                 // increment along the first column of each row
-                var i
-                ;
+                let i;
                 for(i = 0; i <= b.length; i++){
                     matrix[i] = [i];
                 }
 
                 // increment each column in the first row
-                var j;
+                let j;
                 for(j = 0; j <= a.length; j++){
                     matrix[0][j] = j;
                 }
@@ -95,8 +94,8 @@ module.exports = (client, msg) => {
                 mal.anime.search(item)
                    .then(result =>
                        {
-                           var current_min = Number.MAX_SAFE_INTEGER;
-                           var current_anime, temp;
+                           let current_min = Number.MAX_SAFE_INTEGER;
+                           let current_anime, temp;
                            result.anime.forEach(function (ani) {
                                if (current_min > (temp = levenshtein_distance(item, ani.title[0]))) {
                                    current_min = temp;

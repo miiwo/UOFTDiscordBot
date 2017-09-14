@@ -24,7 +24,7 @@ exports.run = async(client, msg, args) => {
     m.channel.startTyping();
 
     try {
-        const info = await rp(options);
+        const info = await rp(options); //change var name to "results"/cobalt
         if (info.length == 0) {
             m.channel.stopTyping();
             m.edit(":slight_frown: **||** Nothing came up.");
