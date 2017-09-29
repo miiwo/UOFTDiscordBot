@@ -1,4 +1,4 @@
-module.exports = (client) => {
+module.exports = (client, Discord) => {
     /**
     * Function to grab User's permission levels.
     *
@@ -33,6 +33,10 @@ module.exports = (client) => {
             return false;
         }
     };
+    
+    client.createRichEmbed = () => {
+        return new Discord.RichEmbed();
+    }
     
     
 };

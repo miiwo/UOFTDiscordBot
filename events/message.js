@@ -1,3 +1,8 @@
+const MALjs = require('MALjs');
+const htmlToText = require('html-to-text');
+
+const regex = /{{(.*?)}}/g;
+
 module.exports = (client, msg) => {
     if(msg.author.bot) return;
 
@@ -6,13 +11,17 @@ module.exports = (client, msg) => {
         const args = msg.content.split(/\s+/);
         const commandName = args.shift().slice(client.config.prefix.length).toLowerCase();
 
-        if(responseList[commandName])
-            return msg.channel.send(responseList[commandName]);
+        if(responseList[commandName]){
+            msg.channel.send(responseList[commandName]);
+            return;
+        }
 
         let command = client.commands.get(commandName);
         if(command){
-            if(client.permlevel(msg) < command.help.permission)
-                return msg.channel.send("Insufficient Perms");
+            if(client.permlevel(msg) < command.help.permission){
+                msg.channel.send("Insufficient Perms");
+                return;
+            }
 
             if(args[0] === "h"){
                 msg.channel.send(`Command: ${command.help.name} \nDescription: ${command.help.description} \n\n\` Ex. ${command.help.usage}\``);
@@ -24,9 +33,9 @@ module.exports = (client, msg) => {
             command.run(client, msg, args);
         }
     } else {
-        var regex = /{{(.*?)}}/g;
-        var match;
-        var regex_matches = [];
+        
+        let match;
+        let regex_matches = [];
         while ((match = regex.exec(msg.content)) != null) {
             regex_matches.push(match[1]);
         }
@@ -37,17 +46,16 @@ module.exports = (client, msg) => {
                 if(a.length == 0) return b.length; 
                 if(b.length == 0) return a.length; 
 
-                var matrix = [];
+                let matrix = [];
 
                 // increment along the first column of each row
-                var i
-                ;
+                let i;
                 for(i = 0; i <= b.length; i++){
                     matrix[i] = [i];
                 }
 
                 // increment each column in the first row
-                var j;
+                let j;
                 for(j = 0; j <= a.length; j++){
                     matrix[0][j] = j;
                 }
@@ -69,9 +77,8 @@ module.exports = (client, msg) => {
             };
             
             function format_message(anime) {
-                var htmlToText = require('html-to-text');
-                const Discord = require("discord.js");
-                const embed = new Discord.RichEmbed()
+                
+                const embed = client.createRichEmbed()
                                          .setTitle(anime.title[0].toString())
                                          .setDescription(htmlToText.fromString(anime.synopsis).replace(/\[.*?\]|\n/g, ""))
                                          .setThumbnail(anime.image[0].toString())
@@ -82,14 +89,13 @@ module.exports = (client, msg) => {
                 msg.channel.send({embed});
             }
 
-            const MALjs = require('MALjs');
             const mal = new MALjs(client.config.mal_user, client.config.mal_pass);
             regex_matches.forEach(function (item) {
                 mal.anime.search(item)
                    .then(result =>
                        {
-                           var current_min = Number.MAX_SAFE_INTEGER;
-                           var current_anime, temp;
+                           let current_min = Number.MAX_SAFE_INTEGER;
+                           let current_anime, temp;
                            result.anime.forEach(function (ani) {
                                if (current_min > (temp = levenshtein_distance(item, ani.title[0]))) {
                                    current_min = temp;

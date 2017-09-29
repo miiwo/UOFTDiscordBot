@@ -9,7 +9,7 @@ const { promisify } = require("util");
 const readdir = promisify(require("fs").readdir);
 
 const client = new Discord.Client();
-require("./modules/functions.js")(client);
+require("./modules/functions.js")(client, Discord);
 client.config = require("./config.json");
 client.commands = new Discord.Collection();
 
