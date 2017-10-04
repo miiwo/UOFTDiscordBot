@@ -24,7 +24,7 @@ exports.run = async(client, msg, args) => {
     m.channel.startTyping();
 
     try {
-        const info = await rp(options); //change var name to "results"/cobalt
+        const info = await rp(options);
         if (info.length == 0) {
             m.channel.stopTyping();
             m.edit(":slight_frown: **||** Nothing came up.");
@@ -33,7 +33,7 @@ exports.run = async(client, msg, args) => {
 
         // Courses
         if (courseCodeRegex.test(args[0])) {
-            const results = displayCourses(info);
+            const results = concatCourses(info);
 
             if (results.length > DM_USER) m = await msg.member.createDM();
 
@@ -53,7 +53,7 @@ exports.run = async(client, msg, args) => {
         } else if (examRegex.test(args[0])) {
             if (args.length > 1 && courseCodeRegex.test(args[1].toUpperCase())) {
                 msg.channel.send({
-                    embed: displayExam(info)
+                    embed: createExamEmbed(info)
                 });
                 m.edit(":floppy_disk: **||** This data was last updated for the `2016 YEAR`.");
             }
@@ -61,7 +61,7 @@ exports.run = async(client, msg, args) => {
         m.channel.stopTyping();
 
     } catch (e) {
-        if (client.user.typingIn(m.channel)) m.channel.stopTyping();
+        m.channel.stopTyping(true);
 
         m.channel.send("There was an error, oh no! :dizzy_face:");
         console.log(e);
@@ -115,7 +115,7 @@ function createSearchable(config, args) {
             if (courseCodeRegex.test(args[1]))
                 searchable.qs.q = `code:"${args[1]}"`;
             if (args.length > 2) {
-                args[2] = args[2].toLowerCase() === 'sg' ? 'UTSG' : args[2].toUpperCase();
+                args[2] = (args[2].toLowerCase() === 'sg') ? 'UTSG' : args[2].toUpperCase();
                 if (CAMPUSSHORTCUTS.includes(args[1]))
                     searchable.qs.q += ` AND campus:"${args[2]}"`; //Provide period here once exam data gets updated.
             }
@@ -134,10 +134,10 @@ function createSearchable(config, args) {
 }
 
 /**
- * Function that concatenates courses with the same code into one object in the list.
+ * Function that concatenates courses with the same code into one object in the list. Something something Fall/Winter.
  * @param {list} info - List of Objects that contain the information retrieved from the request
  */
-function displayCourses(info) {
+function concatCourses(info) {
     const courses = [info[0]];
     courses[0].code = courses[0].code.slice(0, 9);
 
@@ -200,7 +200,7 @@ function secondsToTimeFormat(time, showTimeZone = false) {
     return new Date(time * 1000 + TIMEZONEOFFSET * 60000).toLocaleTimeString("en-ca", options);
 }
 
-function displayExam(info) {
+function createExamEmbed(info) {
     const startTime = secondsToTimeFormat(info[0].start_time);
     const endTime = secondsToTimeFormat(info[0].end_time, true);
     
