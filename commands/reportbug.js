@@ -10,7 +10,7 @@ exports.run = async(client, msg, args) => {
                           `Id: ${msg.author.id}\n` +
                           `Message: ${args.join(" ")}\n` +
                           `-----------------------------------------------------\n`);
-        msg.channel.send("Bug successfully reported. @Wolfe#2282 should be checking the logs somtime soon.");
+        msg.channel.send("Bug successfully reported. @Executive should be checking the logs somtime soon.");
     } catch (err) {
         msg.channel.send("There was an error, oh no! :dizzy_face:");
     }
