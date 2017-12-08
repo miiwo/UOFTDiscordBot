@@ -18,7 +18,6 @@ client.commands = new Discord.Collection();
 global.wait = promisify(setTimeout);
 
 async function start() {
-    await wait(5000);
     const fcommand = await readdir("./commands/");
     fcommand.forEach(file => {
         try {

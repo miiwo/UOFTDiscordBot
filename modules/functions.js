@@ -5,7 +5,7 @@ module.exports = (client, Discord) => {
     *@param {Message}   msg         - Message to grab Permission Level from
     */
     client.permlevel = msg => {
-        const ExecRole = msg.guild.roles.find(r => r.name === "Executive");
+        const ExecRole = global.execRole;
         if(ExecRole && msg.member.roles.has(ExecRole.id)) return 10;
         return 5;
     };
